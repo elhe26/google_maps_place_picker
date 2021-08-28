@@ -33,6 +33,7 @@ class GoogleMapPlacePicker extends StatelessWidget {
     Key? key,
     required this.initialTarget,
     required this.appBarKey,
+    this.activateMapIcons: true,
     this.selectedPlaceWidgetBuilder,
     this.pinBuilder,
     this.onSearchFailed,
@@ -51,6 +52,19 @@ class GoogleMapPlacePicker extends StatelessWidget {
     this.forceSearchOnZoomChanged,
     this.hidePlaceDetailsWhenDraggingPin,
     this.useCameraLocationAsCoordinates,
+    this.myLocationEnabled: true,
+    this.myLocationButtonEnabled: true,
+    this.zoomControlsEnabled: true,
+    this.zoomGesturesEnabled: true,
+    this.mapToolbarEnabled: true,
+    this.buildingsEnabled: true,
+    this.trafficEnabled: true,
+    this.rotateGesturesEnabled: true,
+    this.tiltGesturesEnabled: true,
+    this.indoorViewEnabled: true,
+    this.compassEnabled: true,
+    this.scrollGesturesEnabled: true,
+    this.mapStyle,
   }) : super(key: key);
 
   final LatLng initialTarget;
@@ -81,6 +95,23 @@ class GoogleMapPlacePicker extends StatelessWidget {
   final bool? hidePlaceDetailsWhenDraggingPin;
 
   final bool? useCameraLocationAsCoordinates;
+
+  // Google Maps Configuration
+  final bool? myLocationEnabled;
+  final bool? myLocationButtonEnabled;
+  final bool? zoomControlsEnabled;
+  final bool? zoomGesturesEnabled;
+  final bool? mapToolbarEnabled;
+  final bool? buildingsEnabled;
+  final bool? trafficEnabled;
+  final bool? rotateGesturesEnabled;
+  final bool? tiltGesturesEnabled;
+  final bool? indoorViewEnabled;
+  final bool? compassEnabled;
+  final bool? scrollGesturesEnabled;
+  final String? mapStyle;
+
+  final bool? activateMapIcons;
 
   _searchByCameraLocation(PlaceProvider provider) async {
     // We don't want to search location again if camera location is changed by zooming in/out.
@@ -162,15 +193,45 @@ class GoogleMapPlacePicker extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       children: <Widget>[
-        _buildGoogleMap(context),
+        _buildGoogleMap(
+          context,
+          myLocationEnabled!,
+          myLocationButtonEnabled!,
+          zoomControlsEnabled!,
+          zoomGesturesEnabled!,
+          mapToolbarEnabled!,
+          buildingsEnabled!,
+          trafficEnabled!,
+          rotateGesturesEnabled!,
+          tiltGesturesEnabled!,
+          indoorViewEnabled!,
+          compassEnabled!,
+          scrollGesturesEnabled!,
+          mapStyle,
+        ),
         _buildPin(),
         _buildFloatingCard(),
-        _buildMapIcons(context),
+        if (activateMapIcons ?? true) _buildMapIcons(context),
       ],
     );
   }
 
-  Widget _buildGoogleMap(BuildContext context) {
+  Widget _buildGoogleMap(
+    BuildContext context,
+    bool myLocationEnabled,
+    bool myLocationButtonEnabled,
+    bool zoomControlsEnabled,
+    bool zoomGesturesEnabled,
+    bool mapToolbarEnabled,
+    bool buildingsEnabled,
+    bool trafficEnabled,
+    bool rotateGesturesEnabled,
+    bool tiltGesturesEnabled,
+    bool indoorViewEnabled,
+    bool compassEnabled,
+    bool scrollGesturesEnabled,
+    String? mapStyle,
+  ) {
     return Selector<PlaceProvider, MapType>(
         selector: (_, provider) => provider.mapType,
         builder: (_, data, __) {
@@ -179,16 +240,29 @@ class GoogleMapPlacePicker extends StatelessWidget {
               CameraPosition(target: initialTarget, zoom: 15);
 
           return GoogleMap(
-            myLocationButtonEnabled: false,
-            compassEnabled: false,
-            mapToolbarEnabled: false,
             initialCameraPosition: initialCameraPosition,
             mapType: data,
-            myLocationEnabled: true,
-            onMapCreated: (GoogleMapController controller) {
+            myLocationEnabled: myLocationEnabled,
+            myLocationButtonEnabled: myLocationButtonEnabled,
+            zoomControlsEnabled: zoomControlsEnabled,
+            zoomGesturesEnabled: zoomGesturesEnabled,
+            mapToolbarEnabled: mapToolbarEnabled,
+            buildingsEnabled: buildingsEnabled,
+            trafficEnabled: trafficEnabled,
+            rotateGesturesEnabled: rotateGesturesEnabled,
+            tiltGesturesEnabled: tiltGesturesEnabled,
+            indoorViewEnabled: indoorViewEnabled,
+            compassEnabled: compassEnabled,
+            scrollGesturesEnabled: scrollGesturesEnabled,
+
+            onMapCreated: (GoogleMapController controller) async {
               provider.mapController = controller;
               provider.setCameraPosition(null);
               provider.pinState = PinState.Idle;
+
+              if (mapStyle != null) {
+                await provider.mapController!.setMapStyle(mapStyle);
+              }
 
               // When select initialPosition set to true.
               if (selectInitialPosition!) {

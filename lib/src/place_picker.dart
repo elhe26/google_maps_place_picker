@@ -62,6 +62,20 @@ class PlacePicker extends StatefulWidget {
     this.autocompleteOnTrailingWhitespace = false,
     this.hidePlaceDetailsWhenDraggingPin = true,
     this.useCameraLocationAsCoordinates = false,
+    this.myLocationEnabled: true,
+    this.myLocationButtonEnabled: true,
+    this.zoomControlsEnabled: true,
+    this.zoomGesturesEnabled: true,
+    this.mapToolbarEnabled: true,
+    this.buildingsEnabled: true,
+    this.trafficEnabled: true,
+    this.rotateGesturesEnabled: true,
+    this.tiltGesturesEnabled: true,
+    this.indoorViewEnabled: true,
+    this.compassEnabled: true,
+    this.scrollGesturesEnabled: true,
+    this.activateMapIcons: true,
+    this.mapStyle,
   }) : super(key: key);
 
   final String apiKey;
@@ -97,6 +111,48 @@ class PlacePicker extends StatefulWidget {
   final List<Component>? autocompleteComponents;
   final bool? strictbounds;
   final String? region;
+
+  /// Visualize Default Map Icon widgets 
+  final bool activateMapIcons;
+
+  /// Google Maps Configuration
+  final bool? myLocationEnabled;
+
+  /// Google Maps Configuration
+  final bool? myLocationButtonEnabled;
+
+  /// Google Maps Configuration
+  final bool? zoomControlsEnabled;
+
+  /// Google Maps Configuration
+  final bool? zoomGesturesEnabled;
+
+  /// Google Maps Configuration
+  final bool? mapToolbarEnabled;
+
+  /// Google Maps Configuration
+  final bool? buildingsEnabled;
+
+  /// Google Maps Configuration
+  final bool? trafficEnabled;
+
+  /// Google Maps Configuration
+  final bool? rotateGesturesEnabled;
+
+  /// Google Maps Configuration
+  final bool? tiltGesturesEnabled;
+
+  /// Google Maps Configuration
+  final bool? indoorViewEnabled;
+
+  /// Google Maps Configuration
+  final bool? compassEnabled;  
+  
+  /// Google Maps Configuration
+  final bool? scrollGesturesEnabled;
+
+  /// Google Maps Configuration
+  final String? mapStyle;
 
   /// If true the [body] and the scaffold's floating widgets should size
   /// themselves to avoid the onscreen keyboard whose height is defined by the
@@ -415,6 +471,20 @@ class _PlacePickerState extends State<PlacePicker> {
       language: widget.autocompleteLanguage,
       forceSearchOnZoomChanged: widget.forceSearchOnZoomChanged,
       hidePlaceDetailsWhenDraggingPin: widget.hidePlaceDetailsWhenDraggingPin,
+      myLocationEnabled: widget.myLocationEnabled,
+      myLocationButtonEnabled: widget.myLocationButtonEnabled,
+      zoomControlsEnabled: widget.zoomControlsEnabled,
+      zoomGesturesEnabled: widget.zoomGesturesEnabled,
+      mapToolbarEnabled: widget.mapToolbarEnabled,
+      buildingsEnabled: widget.buildingsEnabled,
+      trafficEnabled: widget.trafficEnabled,
+      rotateGesturesEnabled: widget.rotateGesturesEnabled,
+      tiltGesturesEnabled: widget.tiltGesturesEnabled,
+      indoorViewEnabled: widget.indoorViewEnabled,
+      compassEnabled: widget.compassEnabled,
+      scrollGesturesEnabled: widget.scrollGesturesEnabled,
+      mapStyle: widget.mapStyle,
+      activateMapIcons: widget.activateMapIcons,
       onToggleMapType: () {
         provider!.switchMapType();
       },
