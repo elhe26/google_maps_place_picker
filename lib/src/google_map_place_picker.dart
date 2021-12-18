@@ -426,18 +426,18 @@ class GoogleMapPlacePicker extends StatelessWidget {
           return GoogleMap(
             initialCameraPosition: initialCameraPosition,
             mapType: data,
-            myLocationEnabled: myLocationEnabled ?? false,
-            myLocationButtonEnabled: myLocationButtonEnabled  ?? false,
+            myLocationEnabled: myLocationEnabled,
+            myLocationButtonEnabled: myLocationButtonEnabled ,
             zoomControlsEnabled: zoomControlsEnabled,
             zoomGesturesEnabled: zoomGesturesEnabled,
-            mapToolbarEnabled: mapToolbarEnabled ?? false,
-            buildingsEnabled: buildingsEnabled ?? false,
-            trafficEnabled: trafficEnabled ?? false,
-            rotateGesturesEnabled: rotateGesturesEnabled ?? false,
-            tiltGesturesEnabled: tiltGesturesEnabled ?? false,
-            indoorViewEnabled: indoorViewEnabled ?? false,
-            compassEnabled: compassEnabled ?? false,
-            scrollGesturesEnabled: scrollGesturesEnabled ?? false,
+            mapToolbarEnabled: mapToolbarEnabled,
+            buildingsEnabled: buildingsEnabled,
+            trafficEnabled: trafficEnabled,
+            rotateGesturesEnabled: rotateGesturesEnabled,
+            tiltGesturesEnabled: tiltGesturesEnabled,
+            indoorViewEnabled: indoorViewEnabled,
+            compassEnabled: compassEnabled,
+            scrollGesturesEnabled: scrollGesturesEnabled,
 
             onMapCreated: (GoogleMapController controller) async {
               provider.mapController = controller;
