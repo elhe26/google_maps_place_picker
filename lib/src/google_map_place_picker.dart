@@ -65,6 +65,8 @@ class GoogleMapPlacePicker extends StatelessWidget {
     this.compassEnabled: true,
     this.scrollGesturesEnabled: true,
     this.mapStyle,
+    this.customBarWidgetBuilder,
+    this.useDefaultSearchBar: true,
   }) : super(key: key);
 
   final LatLng initialTarget;
@@ -112,6 +114,10 @@ class GoogleMapPlacePicker extends StatelessWidget {
   final String? mapStyle;
 
   final bool? activateMapIcons;
+
+  final Widget? customBarWidgetBuilder;
+
+  final bool useDefaultSearchBar;
 
   _searchByCameraLocation(PlaceProvider provider) async {
     // We don't want to search location again if camera location is changed by zooming in/out.

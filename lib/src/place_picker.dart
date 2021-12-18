@@ -76,6 +76,8 @@ class PlacePicker extends StatefulWidget {
     this.scrollGesturesEnabled: true,
     this.activateMapIcons: true,
     this.mapStyle,
+    this.customBarWidgetBuilder,
+    this.useDefaultSearchBar: true,
   }) : super(key: key);
 
   final String apiKey;
@@ -112,7 +114,7 @@ class PlacePicker extends StatefulWidget {
   final bool? strictbounds;
   final String? region;
 
-  /// Visualize Default Map Icon widgets 
+  /// Visualize Default Map Icon widgets
   final bool activateMapIcons;
 
   /// Google Maps Configuration
@@ -146,8 +148,8 @@ class PlacePicker extends StatefulWidget {
   final bool? indoorViewEnabled;
 
   /// Google Maps Configuration
-  final bool? compassEnabled;  
-  
+  final bool? compassEnabled;
+
   /// Google Maps Configuration
   final bool? scrollGesturesEnabled;
 
@@ -225,6 +227,12 @@ class PlacePicker extends StatefulWidget {
 
   final bool useCameraLocationAsCoordinates;
 
+  /// This will build a custom bar instead of the default search bar
+  final Widget? customBarWidgetBuilder;
+
+  /// This will activate/deactivate the search bar to use the customBarWidgetBuilder
+  final bool useDefaultSearchBar;
+
   @override
   _PlacePickerState createState() => _PlacePickerState();
 }
@@ -244,7 +252,9 @@ class _PlacePickerState extends State<PlacePicker> {
 
   @override
   void dispose() {
-    searchBarController.dispose();
+    if (widget.useDefaultSearchBar) {
+      searchBarController.dispose();
+    }
 
     super.dispose();
   }
@@ -268,7 +278,9 @@ class _PlacePickerState extends State<PlacePicker> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () {
-        searchBarController.clearOverlay();
+        if (widget.useDefaultSearchBar) {
+          searchBarController.clearOverlay();
+        }
         return Future.value(true);
       },
       child: FutureBuilder<PlaceProvider>(
@@ -292,7 +304,9 @@ class _PlacePickerState extends State<PlacePicker> {
                   elevation: 0,
                   backgroundColor: Colors.transparent,
                   titleSpacing: 0.0,
-                  title: _buildSearchBar(context),
+                  title: widget.useDefaultSearchBar
+                      ? _buildSearchBar(context)
+                      : widget.customBarWidgetBuilder,
                 ),
                 body: _buildMapWithLocation(),
               ),
@@ -501,7 +515,9 @@ class _PlacePickerState extends State<PlacePicker> {
         }
       },
       onMoveStart: () {
-        searchBarController.reset();
+        if (widget.useDefaultSearchBar) {
+          searchBarController.reset();
+        }
       },
       onPlacePicked: widget.onPlacePicked,
       useCameraLocationAsCoordinates: widget.useCameraLocationAsCoordinates,
