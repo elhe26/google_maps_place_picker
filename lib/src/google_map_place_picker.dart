@@ -67,6 +67,12 @@ class GoogleMapPlacePicker extends StatelessWidget {
     this.mapStyle,
     this.customBarWidgetBuilder,
     this.useDefaultSearchBar: true,
+    this.iconPlaceColor,
+    this.iconPointerColor,
+    this.mapTypeColor,
+    this.myLocationColor,
+    this.mapToolSeparation, 
+    this.mapToolRight,
   }) : super(key: key);
 
   final LatLng initialTarget;
@@ -117,7 +123,19 @@ class GoogleMapPlacePicker extends StatelessWidget {
 
   final Widget? customBarWidgetBuilder;
 
-  final bool useDefaultSearchBar;
+  final bool? useDefaultSearchBar;
+
+  final Color? iconPlaceColor;
+
+  final Color? iconPointerColor;
+
+  final Color? mapTypeColor;
+
+  final Color? myLocationColor;
+
+  final double? mapToolSeparation;
+
+  final double? mapToolRight;
 
   _searchByCameraLocation(PlaceProvider provider) async {
     // We don't want to search location again if camera location is changed by zooming in/out.
@@ -215,7 +233,7 @@ class GoogleMapPlacePicker extends StatelessWidget {
           scrollGesturesEnabled!,
           mapStyle,
         ),
-        _buildPin(),
+        _buildPin(iconPlaceColor!, iconPointerColor!),
         _buildFloatingCard(),
         if (activateMapIcons ?? true) _buildMapIcons(context),
       ],
@@ -328,13 +346,18 @@ class GoogleMapPlacePicker extends StatelessWidget {
         });
   }
 
-  Widget _buildPin() {
+  Widget _buildPin(Color iconPlaceColor, Color iconPointerColor) {
     return Center(
       child: Selector<PlaceProvider, PinState>(
         selector: (_, provider) => provider.pinState,
         builder: (context, state, __) {
           if (pinBuilder == null) {
-            return _defaultPinBuilder(context, state);
+            return _defaultPinBuilder(
+              context,
+              state,
+              iconPlaceColor,
+              iconPointerColor,
+            );
           } else {
             return Builder(
                 builder: (builderContext) =>
@@ -345,7 +368,12 @@ class GoogleMapPlacePicker extends StatelessWidget {
     );
   }
 
-  Widget _defaultPinBuilder(BuildContext context, PinState state) {
+  Widget _defaultPinBuilder(
+    BuildContext context,
+    PinState state,
+    Color iconPlaceColor,
+    Color iconPointerColor,
+  ) {
     if (state == PinState.Preparing) {
       return Container();
     } else if (state == PinState.Idle) {
@@ -355,7 +383,7 @@ class GoogleMapPlacePicker extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                Icon(Icons.place, size: 36, color: Colors.red),
+                Icon(Icons.place, size: 36, color: iconPlaceColor),
                 SizedBox(height: 42),
               ],
             ),
@@ -365,7 +393,7 @@ class GoogleMapPlacePicker extends StatelessWidget {
               width: 5,
               height: 5,
               decoration: BoxDecoration(
-                color: Colors.black,
+                color: iconPointerColor,
                 shape: BoxShape.circle,
               ),
             ),
@@ -380,7 +408,12 @@ class GoogleMapPlacePicker extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 AnimatedPin(
-                    child: Icon(Icons.place, size: 36, color: Colors.red)),
+                  child: Icon(
+                    Icons.place,
+                    size: 36,
+                    color: iconPlaceColor,
+                  ),
+                ),
                 SizedBox(height: 42),
               ],
             ),
@@ -390,7 +423,7 @@ class GoogleMapPlacePicker extends StatelessWidget {
               width: 5,
               height: 5,
               decoration: BoxDecoration(
-                color: Colors.black,
+                color: iconPointerColor,
                 shape: BoxShape.circle,
               ),
             ),
@@ -491,7 +524,7 @@ class GoogleMapPlacePicker extends StatelessWidget {
 
     return Positioned(
       top: appBarRenderBox.size.height,
-      right: 15,
+      right: mapToolRight,
       child: Column(
         children: <Widget>[
           enableMapTypeButton!
@@ -505,11 +538,16 @@ class GoogleMapPlacePicker extends StatelessWidget {
                         : Colors.white,
                     elevation: 8.0,
                     onPressed: onToggleMapType,
-                    child: Icon(Icons.layers),
+                    child: Icon(
+                      Icons.layers,
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.white
+                          : mapTypeColor,
+                    ),
                   ),
                 )
               : Container(),
-          SizedBox(height: 10),
+          SizedBox(height: mapToolSeparation),
           enableMyLocationButton!
               ? Container(
                   width: 35,
@@ -521,7 +559,12 @@ class GoogleMapPlacePicker extends StatelessWidget {
                         : Colors.white,
                     elevation: 8.0,
                     onPressed: onMyLocation,
-                    child: Icon(Icons.my_location),
+                    child: Icon(
+                      Icons.my_location,
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.white
+                          : mapTypeColor,
+                    ),
                   ),
                 )
               : Container(),

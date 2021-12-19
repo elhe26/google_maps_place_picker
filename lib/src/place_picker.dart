@@ -78,6 +78,12 @@ class PlacePicker extends StatefulWidget {
     this.mapStyle,
     this.customBarWidgetBuilder,
     this.useDefaultSearchBar: true,
+    this.iconPlaceColor: Colors.red,
+    this.iconPointerColor: Colors.black,
+    this.mapTypeColor: Colors.black,
+    this.myLocationColor: Colors.black, 
+    this.mapToolSeparation: 10, 
+    this.mapToolRight:15,
   }) : super(key: key);
 
   final String apiKey;
@@ -232,6 +238,24 @@ class PlacePicker extends StatefulWidget {
 
   /// This will activate/deactivate the search bar to use the customBarWidgetBuilder
   final bool useDefaultSearchBar;
+
+  /// This will change color  of Icon Place
+  final Color iconPlaceColor;
+
+  /// This will change color  of Pointer
+  final Color iconPointerColor;
+
+  /// This will change color  of layer button
+  final Color mapTypeColor;
+
+  /// This will change color  of location button
+  final Color myLocationColor;
+
+  /// This will change the height of separation between layer and location buttons
+  final double? mapToolSeparation;
+
+  /// This will change right separation from  view
+  final double? mapToolRight;
 
   @override
   _PlacePickerState createState() => _PlacePickerState();
@@ -499,6 +523,14 @@ class _PlacePickerState extends State<PlacePicker> {
       scrollGesturesEnabled: widget.scrollGesturesEnabled,
       mapStyle: widget.mapStyle,
       activateMapIcons: widget.activateMapIcons,
+      useDefaultSearchBar: widget.useDefaultSearchBar,
+      iconPlaceColor: widget.iconPlaceColor,
+      iconPointerColor: widget.iconPointerColor,
+      mapTypeColor: widget.mapTypeColor,
+      myLocationColor: widget.myLocationColor,
+      customBarWidgetBuilder: widget.customBarWidgetBuilder,
+      mapToolSeparation: widget.mapToolSeparation,
+      mapToolRight: widget.mapToolRight,
       onToggleMapType: () {
         provider!.switchMapType();
       },
