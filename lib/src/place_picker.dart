@@ -585,6 +585,14 @@ class _PlacePickerState extends State<PlacePicker> {
       pickArea: widget.pickArea,
       forceSearchOnZoomChanged: widget.forceSearchOnZoomChanged,
       hidePlaceDetailsWhenDraggingPin: widget.hidePlaceDetailsWhenDraggingPin,
+      useDefaultSearchBar: widget.useDefaultSearchBar,
+      iconPlaceColor: widget.iconPlaceColor,
+      iconPointerColor: widget.iconPointerColor,
+      mapTypeColor: widget.mapTypeColor,
+      myLocationColor: widget.myLocationColor,
+      customBarWidgetBuilder: widget.customBarWidgetBuilder,
+      mapToolSeparation: widget.mapToolSeparation,
+      mapToolRight: widget.mapToolRight,
       onToggleMapType: () {
         provider!.switchMapType();
         if (widget.onMapTypeChanged != null) {
