@@ -1,3 +1,98 @@
+## [2.0.0-mb.22] - 08/Aug/2022
+
+- Upgrade packages
+- Fix shadow clipping on AutoCompleteSearch
+- Streamline shadows
+- Prevent re-render of map when toggling the keyboard
+
+## [2.0.0-mb.21] - 31/Jul/2022
+
+- Upgrade geolocator
+
+## [2.0.0-mb.20] - 06/Jun/2022
+
+- Revert previous changes and solve null-aware operation warning in a way that the package is warn-free for Flutter 2 and 3.
+
+## [2.0.0-mb.19] - 26/May/2022
+
+- Remove unnecessary null-aware operation `!` that throws a compiler warning since Flutter 3.0.1
+
+## [2.0.0-mb.18] - 14/May/2022
+
+- Update packages for Flutter 3.0.0
+
+## [2.0.0-mb.17] - 28/Apr/2022
+
+- Add custom zoom buttons
+
+## [2.0.0-mb.16] - 21/Apr/2022
+
+- Add [FVM](https://fvm.app) config
+- Add `onMapTypeChanged` callback event
+
+## [2.0.0-mb.15] - 06/Mar/2022
+
+- Fix autocomplete search vertical offset in containers
+
+## [2.0.0-mb.14] - 24/Feb/2022
+
+- Update geolocator
+- onMapCreated event pass-through
+
+## [2.0.0-mb.13] - 08/Dec/2021
+
+- Update google_maps_webservice
+- Update geolocator
+
+## [2.0.0-mb.11] - 16/Nov/2021
+
+- Upgrade packages and target platforms
+
+## [2.0.0-mb.10] - 25/Oct/2021
+
+- Fix passing-through GoogleMap widget callbacks
+
+## [2.0.0-mb.9] - 08/Sep/2021
+
+- Fix permanent loading indicator when using search bar on iOS
+
+## [2.0.0-mb.8] - 08/Sep/2021
+
+- Fix old address showing up when moving the pin
+
+## [2.0.0-mb.7] - 08/Sep/2021
+
+- Remove automatic scrolling to pick area when trying to pick an invalid location
+- Allow providing button texts
+- Allow providing an introduction modal
+
+## [2.0.0-mb.6] - 03/Sep/2021
+
+- Add possibility to use custom back navigation event
+
+## [2.0.0-mb.5] - 19/Aug/2021
+
+- Provide additional `PlaceProvider` on some `GoogleMap` events
+
+## [2.0.0-mb.4] - 19/Aug/2021
+
+- Hot fix regarding `GoogleMap` event access
+
+## [2.0.0-mb.3] - 19/Aug/2021
+
+- Updated colors and shapes
+- Expose essential `GoogleMap` events
+
+## [2.0.0-mb.2] - 19/Aug/2021
+
+- Fixed runtime and deploy issues on iOS
+
+## [2.0.0-mb.1] - 18/Aug/2021
+
+- Forked
+- Added allowed pick area feature
+- Improved place details widget
+
 ## [2.0.0-nullsafety.3] - 18/Mar/2021
 
 - Updated google_maps_webservice to 0.0.20-nullsafety.2
@@ -16,7 +111,7 @@
 
 ## [1.0.1] - 23/Nov/2020
 
-- Fixed bug related to infinte loading.
+- Fixed bug related to infinite loading.
 
 ## [1.0.0] - 05/Oct/2020
 
