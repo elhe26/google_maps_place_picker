@@ -71,13 +71,33 @@ class PlacePicker extends StatefulWidget {
     this.autocompleteOnTrailingWhitespace = false,
     this.hidePlaceDetailsWhenDraggingPin = true,
     this.useCameraLocationAsCoordinates = false,
+    this.myLocationEnabled: true,
+    this.myLocationButtonEnabled: true,
+    this.zoomControlsEnabled: true,
+    this.zoomGesturesEnabled: true,
+    this.mapToolbarEnabled: true,
+    this.buildingsEnabled: true,
+    this.trafficEnabled: true,
+    this.rotateGesturesEnabled: true,
+    this.tiltGesturesEnabled: true,
+    this.indoorViewEnabled: true,
+    this.compassEnabled: true,
+    this.scrollGesturesEnabled: true,
+    this.activateMapIcons: true,
+    this.mapStyle,
+    this.customBarWidgetBuilder,
+    this.useDefaultSearchBar: true,
+    this.iconPlaceColor: Colors.red,
+    this.iconPointerColor: Colors.black,
+    this.mapTypeColor: Colors.black,
+    this.myLocationColor: Colors.black, 
+    this.mapToolSeparation: 10, 
+    this.mapToolRight:15,
     this.onTapBack,
     this.onCameraMoveStarted,
     this.onCameraMove,
     this.onCameraIdle,
     this.onMapTypeChanged,
-    this.zoomGesturesEnabled = true,
-    this.zoomControlsEnabled = false,
   }) : super(key: key);
 
   final String apiKey;
@@ -112,6 +132,41 @@ class PlacePicker extends StatefulWidget {
   final bool? strictbounds;
   final String? region;
 
+  /// Visualize Default Map Icon widgets
+  final bool activateMapIcons;
+
+  /// Google Maps Configuration
+  final bool? myLocationEnabled;
+
+  /// Google Maps Configuration
+  final bool? myLocationButtonEnabled;
+
+  /// Google Maps Configuration
+  final bool? mapToolbarEnabled;
+
+  /// Google Maps Configuration
+  final bool? buildingsEnabled;
+
+  /// Google Maps Configuration
+  final bool? trafficEnabled;
+
+  /// Google Maps Configuration
+  final bool? rotateGesturesEnabled;
+
+  /// Google Maps Configuration
+  final bool? tiltGesturesEnabled;
+
+  /// Google Maps Configuration
+  final bool? indoorViewEnabled;
+
+  /// Google Maps Configuration
+  final bool? compassEnabled;
+
+  /// Google Maps Configuration
+  final bool? scrollGesturesEnabled;
+
+  /// Google Maps Configuration
+  final String? mapStyle;
   /// If set the picker can only pick addresses in the given circle area.
   /// The section will be highlighted.
   final CircleArea? pickArea;
@@ -232,6 +287,30 @@ class PlacePicker extends StatefulWidget {
   final bool zoomGesturesEnabled;
   final bool zoomControlsEnabled;
 
+  /// This will build a custom bar instead of the default search bar
+  final Widget? customBarWidgetBuilder;
+
+  /// This will activate/deactivate the search bar to use the customBarWidgetBuilder
+  final bool useDefaultSearchBar;
+
+  /// This will change color  of Icon Place
+  final Color iconPlaceColor;
+
+  /// This will change color  of Pointer
+  final Color iconPointerColor;
+
+  /// This will change color  of layer button
+  final Color mapTypeColor;
+
+  /// This will change color  of location button
+  final Color myLocationColor;
+
+  /// This will change the height of separation between layer and location buttons
+  final double? mapToolSeparation;
+
+  /// This will change right separation from  view
+  final double? mapToolRight;
+
   @override
   _PlacePickerState createState() => _PlacePickerState();
 }
@@ -252,7 +331,9 @@ class _PlacePickerState extends State<PlacePicker> {
 
   @override
   void dispose() {
-    searchBarController.dispose();
+    if (widget.useDefaultSearchBar) {
+      searchBarController.dispose();
+    }
 
     super.dispose();
   }
@@ -277,42 +358,46 @@ class _PlacePickerState extends State<PlacePicker> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-        onWillPop: () {
+      onWillPop: () {
+        if (widget.useDefaultSearchBar) {
           searchBarController.clearOverlay();
-          return Future.value(true);
-        },
-        child: FutureBuilder<PlaceProvider>(
-          future: _futureProvider,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
+        }
+        return Future.value(true);
+      },
+      child: FutureBuilder<PlaceProvider>(
+        future: _futureProvider,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
             } else if (snapshot.hasData) {
-              provider = snapshot.data;
+            provider = snapshot.data;
 
-              return MultiProvider(
-                providers: [
-                  ChangeNotifierProvider<PlaceProvider>.value(value: provider!),
-                ],
-                child: Stack(children: [
-                  Scaffold(
-                    key: ValueKey<int>(provider.hashCode),
-                    resizeToAvoidBottomInset: widget.resizeToAvoidBottomInset,
-                    extendBodyBehindAppBar: true,
-                    appBar: AppBar(
-                      key: appBarKey,
-                      automaticallyImplyLeading: false,
-                      iconTheme: Theme.of(context).iconTheme,
-                      elevation: 0,
-                      backgroundColor: Colors.transparent,
-                      titleSpacing: 0.0,
-                      title: _buildSearchBar(context),
-                    ),
-                    body: _buildMapWithLocation(),
-                  ),
-                  _buildIntroModal(context),
-                ]),
-              );
-            }
+            return MultiProvider(
+              providers: [
+                ChangeNotifierProvider<PlaceProvider>.value(value: provider!),
+              ],
+              child: Stack(children: [
+                Scaffold(
+                key: ValueKey<int>(provider.hashCode),
+                resizeToAvoidBottomInset: widget.resizeToAvoidBottomInset,
+                extendBodyBehindAppBar: true,
+                appBar: AppBar(
+                  key: appBarKey,
+                  automaticallyImplyLeading: false,
+                  iconTheme: Theme.of(context).iconTheme,
+                  elevation: 0,
+                  backgroundColor: Colors.transparent,
+                  titleSpacing: 0.0,
+                  
+                  title: widget.useDefaultSearchBar
+                      ? _buildSearchBar(context)
+                      : widget.customBarWidgetBuilder,
+                ),
+                body: _buildMapWithLocation(),
+              ),
+            _buildIntroModal(context),
+              ],),);
+          }
 
             final children = <Widget>[];
             if (snapshot.hasError) {
@@ -497,6 +582,26 @@ class _PlacePickerState extends State<PlacePicker> {
       pickArea: widget.pickArea,
       forceSearchOnZoomChanged: widget.forceSearchOnZoomChanged,
       hidePlaceDetailsWhenDraggingPin: widget.hidePlaceDetailsWhenDraggingPin,
+      myLocationEnabled: widget.myLocationEnabled,
+      myLocationButtonEnabled: widget.myLocationButtonEnabled,
+      mapToolbarEnabled: widget.mapToolbarEnabled,
+      buildingsEnabled: widget.buildingsEnabled,
+      trafficEnabled: widget.trafficEnabled,
+      rotateGesturesEnabled: widget.rotateGesturesEnabled,
+      tiltGesturesEnabled: widget.tiltGesturesEnabled,
+      indoorViewEnabled: widget.indoorViewEnabled,
+      compassEnabled: widget.compassEnabled,
+      scrollGesturesEnabled: widget.scrollGesturesEnabled,
+      mapStyle: widget.mapStyle,
+      activateMapIcons: widget.activateMapIcons,
+      useDefaultSearchBar: widget.useDefaultSearchBar,
+      iconPlaceColor: widget.iconPlaceColor,
+      iconPointerColor: widget.iconPointerColor,
+      mapTypeColor: widget.mapTypeColor,
+      myLocationColor: widget.myLocationColor,
+      customBarWidgetBuilder: widget.customBarWidgetBuilder,
+      mapToolSeparation: widget.mapToolSeparation,
+      mapToolRight: widget.mapToolRight,
       selectText: widget.selectText,
       outsideOfPickAreaText: widget.outsideOfPickAreaText,
       onToggleMapType: () {
@@ -518,7 +623,9 @@ class _PlacePickerState extends State<PlacePicker> {
         }
       },
       onMoveStart: () {
-        searchBarController.reset();
+        if (widget.useDefaultSearchBar) {
+          searchBarController.reset();
+        }
       },
       onPlacePicked: widget.onPlacePicked,
       useCameraLocationAsCoordinates: widget.useCameraLocationAsCoordinates,

@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_place_picker_mb/google_maps_place_picker.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:google_maps_place_picker/google_maps_place_picker.dart';
 
 // ignore: implementation_imports, unused_import
 import 'package:google_maps_place_picker_mb/src/google_map_place_picker.dart'; // do not import this yourself
 import 'dart:io' show Platform;
 
 // Your api key storage.
-import 'keys.dart';
+// import 'keys.dart';
 
 void main() => runApp(MyApp());
 
@@ -39,7 +40,7 @@ class MyApp extends StatelessWidget {
 }
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key key}) : super(key: key);
+  const HomePage({Key? key}) : super(key: key);
 
   static final kInitialPosition = LatLng(-33.8567844, 151.213108);
 
@@ -48,7 +49,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  PickResult selectedPlace;
+  PickResult? selectedPlace;
   bool showPlacePickerInContainer = false;
   bool showGoogleMapInContainer = false;
 
@@ -101,6 +102,12 @@ class _HomePageState extends State<HomePage> {
                                 usePlaceDetailSearch: true,
                                 zoomGesturesEnabled: true,
                                 zoomControlsEnabled: true,
+                          useDefaultSearchBar: false,
+                          //usePlaceDetailSearch: true,
+                          customBarWidgetBuilder: ElevatedButton(
+                            child: Text("Press"),
+                            onPressed: () {},
+                          ),
                                 onMapCreated: (GoogleMapController controller) {
                                   print("Map created");
                                 },
@@ -310,10 +317,6 @@ class _HomePageState extends State<HomePage> {
                         },
                       )
                     ),
-              !showGoogleMapInContainer
-                  ? Container()
-                  : TextField(
-              ),
               // #endregion
             ],
           ),
