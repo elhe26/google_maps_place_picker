@@ -290,7 +290,7 @@ Parameters | Type | Description
 context | BuildContext | Flutter's build context value
 state | PinState | State of pin. (Preparing; When map loading, Idle, Dragging)
 
-### Changing Colours of default FloatingCard
+### Changing Colors of default FloatingCard
 While you can build your own prediction tile, you still can change the style of default tile using themeData as below:
 
 ```dart
@@ -324,7 +324,7 @@ Please file feature requests and bugs at the [issue tracker][tracker].
 
 [tracker]: https://github.com/fysoul17/google_maps_place_picker/issues/new
 
-### Other useful packages you might be insterested
+### Other useful packages you might be interested
 [Firebase Auth Simplify](https://pub.dev/packages/firebase_auth_simplify)   
 [Material design Speed Dial](https://pub.dev/packages/flutter_speed_dial_material_design) 
 
