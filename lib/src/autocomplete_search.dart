@@ -71,7 +71,7 @@ class AutoCompleteSearchState extends State<AutoCompleteSearch> {
   void initState() {
     super.initState();
     if (widget.initialSearchString != null) {
-      _ambiguate(WidgetsBinding.instance)!.addPostFrameCallback((_) {
+      _ambiguate(WidgetsBinding.instance).addPostFrameCallback((_) {
         controller.text = widget.initialSearchString!;
         if (widget.searchForInitialValue!) {
           _onSearchInputChange();
@@ -232,7 +232,7 @@ class AutoCompleteSearchState extends State<AutoCompleteSearch> {
       ),
     );
 
-    Overlay.of(context)!.insert(overlayEntry!);
+    Overlay.of(context).insert(overlayEntry!);
   }
 
   Widget _buildSearchingOverlay() {
@@ -321,5 +321,5 @@ class AutoCompleteSearchState extends State<AutoCompleteSearch> {
   /// with `!` and `?` on the stable branch.
   // TODO: Remove this, once Flutter 2 support is dropped
   // See https://github.com/flutter/flutter/issues/64830
-  T? _ambiguate<T>(T? value) => value;
+  T _ambiguate<T>(T value) => value;
 }

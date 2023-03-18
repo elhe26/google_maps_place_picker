@@ -274,13 +274,13 @@ class _HomePageState extends State<HomePage> {
                           })),
               selectedPlace == null
                   ? Container()
-                  : Text(selectedPlace.formattedAddress),
+                  : Text(selectedPlace?.formattedAddress),
               selectedPlace == null
                   ? Container()
                   : Text("(lat: " +
-                      selectedPlace.geometry.location.lat.toString() +
+                      selectedPlace!.geometry!.location.lat.toString() +
                       ", lng: " +
-                      selectedPlace.geometry.location.lng.toString() +
+                      selectedPlace!.geometry!.location.lng.toString() +
                       ")"),
               // #region Google Map Example without provider
               showPlacePickerInContainer 

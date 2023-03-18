@@ -32,7 +32,7 @@ class GoogleMapPlacePicker extends StatelessWidget {
     Key? key,
     required this.initialTarget,
     required this.appBarKey,
-    this.activateMapIcons: true,
+    this.activateMapIcons = true,
     this.selectedPlaceWidgetBuilder,
     this.pinBuilder,
     this.onSearchFailed,
@@ -52,21 +52,21 @@ class GoogleMapPlacePicker extends StatelessWidget {
     this.forceSearchOnZoomChanged,
     this.hidePlaceDetailsWhenDraggingPin,
     this.useCameraLocationAsCoordinates,
-    this.myLocationEnabled: true,
-    this.myLocationButtonEnabled: true,
-    this.zoomControlsEnabled: true,
-    this.zoomGesturesEnabled: true,
-    this.mapToolbarEnabled: true,
-    this.buildingsEnabled: true,
-    this.trafficEnabled: true,
-    this.rotateGesturesEnabled: true,
-    this.tiltGesturesEnabled: true,
-    this.indoorViewEnabled: true,
-    this.compassEnabled: true,
-    this.scrollGesturesEnabled: true,
+    this.myLocationEnabled = true,
+    this.myLocationButtonEnabled = true,
+    this.zoomControlsEnabled = true,
+    this.zoomGesturesEnabled = true,
+    this.mapToolbarEnabled = true,
+    this.buildingsEnabled = true,
+    this.trafficEnabled = true,
+    this.rotateGesturesEnabled = true,
+    this.tiltGesturesEnabled = true,
+    this.indoorViewEnabled = true,
+    this.compassEnabled = true,
+    this.scrollGesturesEnabled = true,
     this.mapStyle,
     this.customBarWidgetBuilder,
-    this.useDefaultSearchBar: true,
+    this.useDefaultSearchBar = true,
     this.iconPlaceColor,
     this.iconPointerColor,
     this.mapTypeColor,
@@ -302,102 +302,6 @@ class GoogleMapPlacePicker extends StatelessWidget {
     );
   }
 
-  Widget _buildGoogleMapInner(PlaceProvider? provider, MapType mapType) {
-    CameraPosition initialCameraPosition =
-        CameraPosition(target: this.initialTarget, zoom: 15);
-    return GoogleMap(
-      zoomGesturesEnabled: this.zoomGesturesEnabled,
-      zoomControlsEnabled:
-          false, // we use our own implementation that supports iOS as well, see _buildZoomButtons()
-      myLocationButtonEnabled: false,
-      compassEnabled: false,
-      mapToolbarEnabled: false,
-      initialCameraPosition: initialCameraPosition,
-      mapType: mapType,
-      myLocationEnabled: true,
-      circles: pickArea != null && pickArea!.radius > 0
-          ? Set<Circle>.from([pickArea])
-          : Set<Circle>(),
-      onMapCreated: (GoogleMapController controller) {
-        if (provider == null) return;
-        provider.mapController = controller;
-        provider.setCameraPosition(null);
-        provider.pinState = PinState.Idle;
-
-        // When select initialPosition set to true.
-        if (selectInitialPosition!) {
-          provider.setCameraPosition(initialCameraPosition);
-          _searchByCameraLocation(provider);
-        }
-
-        if (onMapCreated != null) {
-          onMapCreated!(controller);
-        }
-      },
-      onCameraIdle: () {
-        if (provider == null) return;
-        if (provider.isAutoCompleteSearching) {
-          provider.isAutoCompleteSearching = false;
-          provider.pinState = PinState.Idle;
-          provider.placeSearchingState = SearchingState.Idle;
-          return;
-        }
-
-        // Perform search only if the setting is to true.
-        if (usePinPointingSearch!) {
-          // Search current camera location only if camera has moved (dragged) before.
-          if (provider.pinState == PinState.Dragging) {
-            // Cancel previous timer.
-            if (provider.debounceTimer?.isActive ?? false) {
-              provider.debounceTimer!.cancel();
-            }
-            provider.debounceTimer =
-                Timer(Duration(milliseconds: debounceMilliseconds!), () {
-              _searchByCameraLocation(provider);
-            });
-          }
-        }
-
-        provider.pinState = PinState.Idle;
-
-        if (onCameraIdle != null) {
-          onCameraIdle!(provider);
-        }
-      },
-      onCameraMoveStarted: () {
-        if (provider == null) return;
-        if (onCameraMoveStarted != null) {
-          onCameraMoveStarted!(provider);
-        }
-
-        provider.setPrevCameraPosition(provider.cameraPosition);
-
-        // Cancel any other timer.
-        provider.debounceTimer?.cancel();
-
-        // Update state, dismiss keyboard and clear text.
-        provider.pinState = PinState.Dragging;
-
-        // Begins the search state if the hide details is enabled
-        if (this.hidePlaceDetailsWhenDraggingPin!) {
-          provider.placeSearchingState = SearchingState.Searching;
-        }
-
-        onMoveStart!();
-      },
-      onCameraMove: (CameraPosition position) {
-        if (provider == null) return;
-        provider.setCameraPosition(position);
-        if (onCameraMove != null) {
-          onCameraMove!(position);
-        }
-      },
-      // gestureRecognizers make it possible to navigate the map when it's a
-      // child in a scroll view e.g ListView, SingleChildScrollView...
-      gestureRecognizers: Set()
-        ..add(Factory<EagerGestureRecognizer>(() => EagerGestureRecognizer())),
-    );
-  }
 
   Widget _buildGoogleMap(
     BuildContext context,
