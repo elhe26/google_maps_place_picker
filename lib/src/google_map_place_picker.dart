@@ -158,6 +158,7 @@ class GoogleMapPlacePicker extends StatelessWidget {
   /// Use never scrollable scroll-view with maximum dimensions to prevent unnecessary re-rendering.
   final bool fullMotion;
 
+
   _searchByCameraLocation(PlaceProvider provider) async {
     // We don't want to search location again if camera location is changed by zooming in/out.
 
@@ -330,7 +331,7 @@ class GoogleMapPlacePicker extends StatelessWidget {
             initialCameraPosition: initialCameraPosition,
             mapType: data,
             myLocationEnabled: myLocationEnabled,
-            myLocationButtonEnabled: myLocationButtonEnabled,
+            myLocationButtonEnabled: myLocationButtonEnabled ,
             zoomControlsEnabled: zoomControlsEnabled,
             zoomGesturesEnabled: zoomGesturesEnabled,
             mapToolbarEnabled: mapToolbarEnabled,

@@ -167,6 +167,11 @@ class PlacePicker extends StatefulWidget {
 
   /// Google Maps Configuration
   final String? mapStyle;
+
+    /// Allow user to make visible the zoom button & toggle on & off zoom gestures
+  final bool zoomGesturesEnabled;
+  final bool zoomControlsEnabled;
+
   /// If set the picker can only pick addresses in the given circle area.
   /// The section will be highlighted.
   final CircleArea? pickArea;
@@ -283,10 +288,6 @@ class PlacePicker extends StatefulWidget {
   /// Called when the map type has been changed.
   final Function(MapType)? onMapTypeChanged;
 
-  /// Allow user to make visible the zoom button & toggle on & off zoom gestures
-  final bool zoomGesturesEnabled;
-  final bool zoomControlsEnabled;
-
   /// This will build a custom bar instead of the default search bar
   final Widget? customBarWidgetBuilder;
 
@@ -358,46 +359,48 @@ class _PlacePickerState extends State<PlacePicker> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: () {
-        if (widget.useDefaultSearchBar) {
-          searchBarController.clearOverlay();
-        }
-        return Future.value(true);
-      },
-      child: FutureBuilder<PlaceProvider>(
-        future: _futureProvider,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
+        onWillPop: () {
+          if (widget.useDefaultSearchBar) {
+            searchBarController.clearOverlay();
+          }
+          return Future.value(true);
+        },
+        child: FutureBuilder<PlaceProvider>(
+          future: _futureProvider,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
             } else if (snapshot.hasData) {
-            provider = snapshot.data;
+              provider = snapshot.data;
 
-            return MultiProvider(
-              providers: [
-                ChangeNotifierProvider<PlaceProvider>.value(value: provider!),
-              ],
-              child: Stack(children: [
-                Scaffold(
-                key: ValueKey<int>(provider.hashCode),
-                resizeToAvoidBottomInset: widget.resizeToAvoidBottomInset,
-                extendBodyBehindAppBar: true,
-                appBar: AppBar(
-                  key: appBarKey,
-                  automaticallyImplyLeading: false,
-                  iconTheme: Theme.of(context).iconTheme,
-                  elevation: 0,
-                  backgroundColor: Colors.transparent,
-                  titleSpacing: 0.0,
-                  
-                  title: widget.useDefaultSearchBar
-                      ? _buildSearchBar(context)
-                      : widget.customBarWidgetBuilder,
+              return MultiProvider(
+                providers: [
+                  ChangeNotifierProvider<PlaceProvider>.value(value: provider!),
+                ],
+                child: Stack(
+                  children: [
+                    Scaffold(
+                      key: ValueKey<int>(provider.hashCode),
+                      resizeToAvoidBottomInset: widget.resizeToAvoidBottomInset,
+                      extendBodyBehindAppBar: true,
+                      appBar: AppBar(
+                        key: appBarKey,
+                        automaticallyImplyLeading: false,
+                        iconTheme: Theme.of(context).iconTheme,
+                        elevation: 0,
+                        backgroundColor: Colors.transparent,
+                        titleSpacing: 0.0,
+                        title: widget.useDefaultSearchBar
+                            ? _buildSearchBar(context)
+                            : widget.customBarWidgetBuilder,
+                      ),
+                      body: _buildMapWithLocation(),
+                    ),
+                    _buildIntroModal(context),
+                  ],
                 ),
-                body: _buildMapWithLocation(),
-              ),
-            _buildIntroModal(context),
-              ],),);
-          }
+              );
+            }
 
             final children = <Widget>[];
             if (snapshot.hasError) {
@@ -582,18 +585,6 @@ class _PlacePickerState extends State<PlacePicker> {
       pickArea: widget.pickArea,
       forceSearchOnZoomChanged: widget.forceSearchOnZoomChanged,
       hidePlaceDetailsWhenDraggingPin: widget.hidePlaceDetailsWhenDraggingPin,
-      myLocationEnabled: widget.myLocationEnabled,
-      myLocationButtonEnabled: widget.myLocationButtonEnabled,
-      mapToolbarEnabled: widget.mapToolbarEnabled,
-      buildingsEnabled: widget.buildingsEnabled,
-      trafficEnabled: widget.trafficEnabled,
-      rotateGesturesEnabled: widget.rotateGesturesEnabled,
-      tiltGesturesEnabled: widget.tiltGesturesEnabled,
-      indoorViewEnabled: widget.indoorViewEnabled,
-      compassEnabled: widget.compassEnabled,
-      scrollGesturesEnabled: widget.scrollGesturesEnabled,
-      mapStyle: widget.mapStyle,
-      activateMapIcons: widget.activateMapIcons,
       useDefaultSearchBar: widget.useDefaultSearchBar,
       iconPlaceColor: widget.iconPlaceColor,
       iconPointerColor: widget.iconPointerColor,
@@ -602,8 +593,6 @@ class _PlacePickerState extends State<PlacePicker> {
       customBarWidgetBuilder: widget.customBarWidgetBuilder,
       mapToolSeparation: widget.mapToolSeparation,
       mapToolRight: widget.mapToolRight,
-      selectText: widget.selectText,
-      outsideOfPickAreaText: widget.outsideOfPickAreaText,
       onToggleMapType: () {
         provider!.switchMapType();
         if (widget.onMapTypeChanged != null) {
@@ -632,8 +621,6 @@ class _PlacePickerState extends State<PlacePicker> {
       onCameraMoveStarted: widget.onCameraMoveStarted,
       onCameraMove: widget.onCameraMove,
       onCameraIdle: widget.onCameraIdle,
-      zoomGesturesEnabled: widget.zoomGesturesEnabled,
-      zoomControlsEnabled: widget.zoomControlsEnabled,
     );
   }
 

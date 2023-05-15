@@ -25,6 +25,13 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.1"
+  charcode:
+    dependency: transitive
+    description:
+      name: charcode
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.2.0"
   clock:
     dependency: transitive
     description:
@@ -56,7 +63,7 @@ packages:
       sha256: e35129dc44c9118cee2a5603506d823bab99c68393879edb440e0090d07586be
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.5"
+    version: "0.1.3"
   fake_async:
     dependency: transitive
     description:
@@ -103,7 +110,7 @@ packages:
       sha256: "5c23f3613f50586c0bbb2b8f970240ae66b3bd992088cf60dd5ee2e6f7dde3a8"
       url: "https://pub.dev"
     source: hosted
-    version: "9.0.2"
+    version: "9.0.1"
   geolocator_android:
     dependency: transitive
     description:
@@ -111,7 +118,7 @@ packages:
       sha256: "2ba24690aee0a3e1b6b7bd47c2711a50c874e95e4c758346589d35194adf6d6a"
       url: "https://pub.dev"
     source: hosted
-    version: "4.1.7"
+    version: "4.0.2"
   geolocator_apple:
     dependency: transitive
     description:
@@ -119,7 +126,7 @@ packages:
       sha256: "1b17544d250bbfebd2f36157f9ce094b0b07967441c1010243d6ea04f6f5bfe8"
       url: "https://pub.dev"
     source: hosted
-    version: "2.2.1"
+    version: "2.0.0+2"
   geolocator_platform_interface:
     dependency: transitive
     description:
@@ -135,6 +142,14 @@ packages:
       sha256: f68a122da48fcfff68bbc9846bb0b74ef651afe84a1b1f6ec20939de4d6860e1
       url: "https://pub.dev"
     source: hosted
+    version: "2.1.6"
+  geolocator_windows:
+    dependency: transitive
+    description:
+      name: geolocator_windows
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.1.1"
     version: "2.1.6"
   geolocator_windows:
     dependency: transitive
@@ -183,14 +198,14 @@ packages:
       sha256: b26afd071ced828d304892163a88902167e11a732e7ef9c33bab0e1b91c4295e
       url: "https://pub.dev"
     source: hosted
-    version: "2.2.1"
-  google_maps_place_picker_mb:
+    version: "2.2.2"
+  google_maps_place_picker:
     dependency: "direct main"
     description:
       path: ".."
       relative: true
     source: path
-    version: "2.0.0-mb.22"
+    version: "2.0.0-nullsafety.3"
   google_maps_webservice:
     dependency: transitive
     description:
@@ -206,7 +221,7 @@ packages:
       sha256: "6aa2946395183537c8b880962d935877325d6a09a2867c3970c05c0fed6ac482"
       url: "https://pub.dev"
     source: hosted
-    version: "0.13.5"
+    version: "0.13.0"
   http_parser:
     dependency: transitive
     description:
@@ -310,7 +325,14 @@ packages:
       sha256: db9d4f58c908a4ba5953fcee2ae317c94889433e5024c27ce74a37f94267945b
       url: "https://pub.dev"
     source: hosted
-    version: "1.8.2"
+    version: "1.8.0"
+  pedantic:
+    dependency: transitive
+    description:
+      name: pedantic
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.11.0"
   permission_handler:
     dependency: transitive
     description:
@@ -358,6 +380,7 @@ packages:
       sha256: "075f927ebbab4262ace8d0b283929ac5410c0ac4e7fc123c76429564facfb757"
       url: "https://pub.dev"
     source: hosted
+    version: "2.1.2"
     version: "2.1.2"
   provider:
     dependency: transitive
@@ -420,6 +443,7 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.1"
+    version: "1.2.1"
   test_api:
     dependency: transitive
     description:
@@ -459,15 +483,14 @@ packages:
       sha256: "80b3257d1492ce4d091729e3a67a60407d227c27241d6927be0130c98e741803"
       url: "https://pub.dev"
     source: hosted
-    version: "2.1.4"
+    version: "2.1.2"
   win32:
     dependency: transitive
     description:
       name: win32
-      sha256: "5cdbe09a75b5f4517adf213c68aaf53ffa162fadf54ba16f663f94f3d2664a56"
-      url: "https://pub.dev"
+      url: "https://pub.dartlang.org"
     source: hosted
-    version: "4.1.1"
+    version: "2.5.2"
 sdks:
   dart: ">=2.18.0 <3.0.0"
   flutter: ">=3.0.0"
