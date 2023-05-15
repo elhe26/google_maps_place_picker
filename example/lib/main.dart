@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_place_picker_mb/google_maps_place_picker.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-
 // ignore: implementation_imports, unused_import
 import 'package:google_maps_place_picker_mb/src/google_map_place_picker.dart'; // do not import this yourself
 import 'dart:io' show Platform;
@@ -66,17 +65,21 @@ class _HomePageState extends State<HomePage> {
             children: <Widget>[
               Platform.isAndroid && !showPlacePickerInContainer
                   ? Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Switch(value: AndroidGoogleMapsFlutter.useAndroidViewSurface, onChanged: (value) {
-                        setState(() {
-                          showGoogleMapInContainer = false;
-                          AndroidGoogleMapsFlutter.useAndroidViewSurface = value;
-                        });
-                      }),
-                      Text("Use Hybrid Composition"),
-                    ],
-                  )
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Switch(
+                            value:
+                                AndroidGoogleMapsFlutter.useAndroidViewSurface,
+                            onChanged: (value) {
+                              setState(() {
+                                showGoogleMapInContainer = false;
+                                AndroidGoogleMapsFlutter.useAndroidViewSurface =
+                                    value;
+                              });
+                            }),
+                        Text("Use Hybrid Composition"),
+                      ],
+                    )
                   : Container(),
               !showPlacePickerInContainer
                   ? ElevatedButton(
@@ -84,10 +87,10 @@ class _HomePageState extends State<HomePage> {
                       onPressed: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(
-                            builder: (context) {
-                              return PlacePicker(
-                                resizeToAvoidBottomInset: false, // only works on fullscreen, less flickery
+                          MaterialPageRoute(builder: (context) {
+                            return PlacePicker(
+                                resizeToAvoidBottomInset:
+                                    false, // only works on fullscreen, less flickery
                                 apiKey: Platform.isAndroid
                                     ? "APIKeys.androidApiKey"
                                     : "APIKeys.iosApiKey",
@@ -102,114 +105,123 @@ class _HomePageState extends State<HomePage> {
                                 usePlaceDetailSearch: true,
                                 zoomGesturesEnabled: true,
                                 zoomControlsEnabled: true,
-                          useDefaultSearchBar: false,
-                          //usePlaceDetailSearch: true,
-                          onPlacePicked: (result) {
-                            selectedPlace = result;
-                            Navigator.of(context).pop();
-                          },
-                          customBarWidgetBuilder: ElevatedButton(
-                            child: Text("Press"),
-                            onPressed: () {},
-                          ),
-                          //forceSearchOnZoomChanged: true,
-                          //automaticallyImplyAppBarLeading: false,
-                          //autocompleteLanguage: "ko",
-                          //region: 'au',
-                          //selectInitialPosition: true,
-                          selectedPlaceWidgetBuilder:
-                              (_, result, state, isSearchBarFocused) {
-                            print(
-                                "state: $state, isSearchBarFocused: $isSearchBarFocused");
-                            return isSearchBarFocused
-                                ? Container()
-                                : FloatingCard(
-                                    bottomPosition:
-                                        0.0, // MediaQuery.of(context) will cause rebuild. See MediaQuery document for the information.
-                                    leftPosition: 0.0,
-                                    rightPosition: 0.0,
-                                    width: 500,
-                                    borderRadius: BorderRadius.circular(12.0),
-                                    child: state == SearchingState.Searching
-                                        ? Center(
-                                            child: CircularProgressIndicator())
-                                        : ElevatedButton(
-                                            child: Text("Pick Here"),
-                                            onPressed: () {
-                                              // IMPORTANT: You MUST manage selectedPlace data yourself as using this build will not invoke onPlacePicker as
-                                              //            this will override default 'Select here' Button.
-                                              setState(() {
-                                                selectedPlace = result;
-                                              });
+                                useDefaultSearchBar: false,
+                                //usePlaceDetailSearch: true,
+                                onPlacePicked: (result) {
+                                  selectedPlace = result;
+                                  Navigator.of(context).pop();
+                                },
+                                customBarWidgetBuilder: ElevatedButton(
+                                  child: Text("Press"),
+                                  onPressed: () {},
+                                ),
+                                //forceSearchOnZoomChanged: true,
+                                //automaticallyImplyAppBarLeading: false,
+                                //autocompleteLanguage: "ko",
+                                //region: 'au',
+                                //selectInitialPosition: true,
+                                selectedPlaceWidgetBuilder:
+                                    (_, result, state, isSearchBarFocused) {
+                                  print(
+                                      "state: $state, isSearchBarFocused: $isSearchBarFocused");
+                                  return isSearchBarFocused
+                                      ? Container()
+                                      : FloatingCard(
+                                          bottomPosition:
+                                              0.0, // MediaQuery.of(context) will cause rebuild. See MediaQuery document for the information.
+                                          leftPosition: 0.0,
+                                          rightPosition: 0.0,
+                                          width: 500,
+                                          borderRadius:
+                                              BorderRadius.circular(12.0),
+                                          child: state ==
+                                                  SearchingState.Searching
+                                              ? Center(
+                                                  child:
+                                                      CircularProgressIndicator())
+                                              : ElevatedButton(
+                                                  child: Text("Pick Here"),
+                                                  onPressed: () {
+                                                    // IMPORTANT: You MUST manage selectedPlace data yourself as using this build will not invoke onPlacePicker as
+                                                    //            this will override default 'Select here' Button.
+                                                    setState(() {
+                                                      selectedPlace = result;
+                                                    });
 
-                                              print(
-                                                  "do something with [${selectedPlace?.geometry ?? 0}] data");
-                                              Navigator.of(context).pop();
-                                            },
-                                          ),
-                                  );
-                          },
-                          pinBuilder: (context, state) {
-                            if (state == PinState.Idle) {
-                              return Icon(Icons.favorite_border);
-                            } else {
-                              return Icon(Icons.favorite);
-                            }
-                          },
-                          onTapBack: () {
-                            setState(() {
-                              showPlacePickerInContainer = false;
-                            });
-                          })),
-              selectedPlace == null
-                  ? Container()
-                  : Text(selectedPlace?.formattedAddress),
-              selectedPlace == null
-                  ? Container()
-                  : Text("(lat: " +
-                      selectedPlace!.geometry!.location.lat.toString() +
-                      ", lng: " +
-                      selectedPlace!.geometry!.location.lng.toString() +
-                      ")"),
-              // #region Google Map Example without provider
-              showPlacePickerInContainer 
-                ? Container()
-                : ElevatedButton(
-                  child: Text("Toggle Google Map w/o Provider"),
-                  onPressed: () {
-                    setState(() {
-                      showGoogleMapInContainer = !showGoogleMapInContainer;
-                    });
-                  },
-                ),
-              !showGoogleMapInContainer
-                  ? Container()
-                  : Container(
-                      width: MediaQuery.of(context).size.width * 0.75,
-                      height: MediaQuery.of(context).size.height * 0.25,
-                      child: GoogleMap(
-                        zoomGesturesEnabled: false,
-                        zoomControlsEnabled: false,
-                        myLocationButtonEnabled: false,
-                        compassEnabled: false,
-                        mapToolbarEnabled: false,
-                        initialCameraPosition: new CameraPosition(target: HomePage.kInitialPosition, zoom: 15),
-                        mapType: MapType.normal,
-                        myLocationEnabled: true,
-                        onMapCreated: (GoogleMapController controller) {
-                        },
-                        onCameraIdle: () {
-                        },
-                        onCameraMoveStarted: () {
-                        },
-                        onCameraMove: (CameraPosition position) {
-                        },
-                      )
-                    ),
-                  );
-                },
-              ) :
-              selectedPlace == null ? Container() : Text(selectedPlace?.formattedAddress ?? ""),
+                                                    print(
+                                                        "do something with [${selectedPlace?.geometry ?? 0}] data");
+                                                    Navigator.of(context).pop();
+                                                  },
+                                                ),
+                                        );
+                                },
+                                pinBuilder: (context, state) {
+                                  if (state == PinState.Idle) {
+                                    return Icon(Icons.favorite_border);
+                                  } else {
+                                    return Icon(Icons.favorite);
+                                  }
+                                },
+                                onTapBack: () {
+                                  setState(() {
+                                    showPlacePickerInContainer = false;
+                                  });
+                                });
+                          }),
+                          // selectedPlace == null
+                          //     ? Container()
+                          //     : Text(selectedPlace?.formattedAddress),
+                          // selectedPlace == null
+                          //     ? Container()
+                          //     : Text("(lat: " +
+                          //         selectedPlace!.geometry!.location.lat
+                          //             .toString() +
+                          //         ", lng: " +
+                          //         selectedPlace!.geometry!.location.lng
+                          //             .toString() +
+                          //         ")"),
+                          // #region Google Map Example without provider
+                          // showPlacePickerInContainer
+                          //     ? Container()
+                          //     : ElevatedButton(
+                          //         child: Text("Toggle Google Map w/o Provider"),
+                          //         onPressed: () {
+                          //           setState(() {
+                          //             showGoogleMapInContainer =
+                          //                 !showGoogleMapInContainer;
+                          //           });
+                          //         },
+                          //       ),
+                          // !showGoogleMapInContainer
+                          //     ? Container()
+                          //     : Container(
+                          //         width:
+                          //             MediaQuery.of(context).size.width * 0.75,
+                          //         height:
+                          //             MediaQuery.of(context).size.height * 0.25,
+                          //         child: GoogleMap(
+                          //           zoomGesturesEnabled: false,
+                          //           zoomControlsEnabled: false,
+                          //           myLocationButtonEnabled: false,
+                          //           compassEnabled: false,
+                          //           mapToolbarEnabled: false,
+                          //           initialCameraPosition: new CameraPosition(
+                          //               target: HomePage.kInitialPosition,
+                          //               zoom: 15),
+                          //           mapType: MapType.normal,
+                          //           myLocationEnabled: true,
+                          //           onMapCreated:
+                          //               (GoogleMapController controller) {},
+                          //           onCameraIdle: () {},
+                          //           onCameraMoveStarted: () {},
+                          //           onCameraMove: (CameraPosition position) {},
+                          //         )),
+                        );
+                      },
+                    )
+                  : selectedPlace == null
+                      ? Container()
+                      : Text(selectedPlace?.formattedAddress ?? ""),
             ],
           ),
         ));
