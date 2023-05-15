@@ -156,8 +156,55 @@ class _HomePageState extends State<HomePage> {
                               return Icon(Icons.favorite);
                             }
                           },
-                        );
-                      },
+                          onTapBack: () {
+                            setState(() {
+                              showPlacePickerInContainer = false;
+                            });
+                          })),
+              selectedPlace == null
+                  ? Container()
+                  : Text(selectedPlace?.formattedAddress),
+              selectedPlace == null
+                  ? Container()
+                  : Text("(lat: " +
+                      selectedPlace!.geometry!.location.lat.toString() +
+                      ", lng: " +
+                      selectedPlace!.geometry!.location.lng.toString() +
+                      ")"),
+              // #region Google Map Example without provider
+              showPlacePickerInContainer 
+                ? Container()
+                : ElevatedButton(
+                  child: Text("Toggle Google Map w/o Provider"),
+                  onPressed: () {
+                    setState(() {
+                      showGoogleMapInContainer = !showGoogleMapInContainer;
+                    });
+                  },
+                ),
+              !showGoogleMapInContainer
+                  ? Container()
+                  : Container(
+                      width: MediaQuery.of(context).size.width * 0.75,
+                      height: MediaQuery.of(context).size.height * 0.25,
+                      child: GoogleMap(
+                        zoomGesturesEnabled: false,
+                        zoomControlsEnabled: false,
+                        myLocationButtonEnabled: false,
+                        compassEnabled: false,
+                        mapToolbarEnabled: false,
+                        initialCameraPosition: new CameraPosition(target: HomePage.kInitialPosition, zoom: 15),
+                        mapType: MapType.normal,
+                        myLocationEnabled: true,
+                        onMapCreated: (GoogleMapController controller) {
+                        },
+                        onCameraIdle: () {
+                        },
+                        onCameraMoveStarted: () {
+                        },
+                        onCameraMove: (CameraPosition position) {
+                        },
+                      )
                     ),
                   );
                 },

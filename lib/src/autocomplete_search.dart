@@ -321,5 +321,5 @@ class AutoCompleteSearchState extends State<AutoCompleteSearch> {
   /// with `!` and `?` on the stable branch.
   // TODO: Remove this, once Flutter 2 support is dropped
   // See https://github.com/flutter/flutter/issues/64830
-  T? _ambiguate<T>(T? value) => value;
+  T _ambiguate<T>(T value) => value;
 }
