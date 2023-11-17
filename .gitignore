@@ -8,6 +8,7 @@
 .buildlog/
 .history
 .svn/
+.fvm/flutter_sdk
 
 # IntelliJ related
 *.iml
@@ -74,4 +75,9 @@ build/
 !**/ios/**/default.perspectivev3
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
 example/android/app/src/main/AndroidManifest.xml
+
+
+# vscode folder
 .vscode
+
+.dccache

@@ -4,18 +4,25 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_api_headers/google_api_headers.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:google_maps_place_picker/google_maps_place_picker.dart';
-import 'package:google_maps_place_picker/providers/place_provider.dart';
-import 'package:google_maps_place_picker/src/autocomplete_search.dart';
-import 'package:google_maps_place_picker/src/controllers/autocomplete_search_controller.dart';
-import 'package:google_maps_place_picker/src/google_map_place_picker.dart';
-import 'package:google_maps_place_picker/src/utils/uuid.dart';
+import 'package:google_maps_place_picker_mb/google_maps_place_picker.dart';
+import 'package:google_maps_place_picker_mb/providers/place_provider.dart';
+import 'package:google_maps_place_picker_mb/src/autocomplete_search.dart';
+import 'package:google_maps_place_picker_mb/src/controllers/autocomplete_search_controller.dart';
+import 'package:google_maps_place_picker_mb/src/google_map_place_picker.dart';
 import 'package:google_maps_webservice/places.dart';
 import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 import 'dart:io' show Platform;
 
+import 'package:uuid/uuid.dart';
+
+typedef IntroModalWidgetBuilder = Widget Function(
+  BuildContext context,
+  Function? close,
+);
+
 enum PinState { Preparing, Idle, Dragging }
+
 enum SearchingState { Idle, Searching }
 
 class PlacePicker extends StatefulWidget {
@@ -29,14 +36,15 @@ class PlacePicker extends StatefulWidget {
     this.onMapCreated,
     this.hintText,
     this.searchingText,
-    // this.searchBarHeight,
-    // this.contentPadding,
+    this.selectText,
+    this.outsideOfPickAreaText,
     this.onAutoCompleteFailed,
     this.onGeocodingSearchFailed,
     this.proxyBaseUrl,
     this.httpClient,
     this.selectedPlaceWidgetBuilder,
     this.pinBuilder,
+    this.introModalWidgetBuilder,
     this.autoCompleteDebounceInMilliseconds = 500,
     this.cameraMoveDebounceInMilliseconds = 750,
     this.initialMapType = MapType.normal,
@@ -52,6 +60,7 @@ class PlacePicker extends StatefulWidget {
     this.autocompleteTypes,
     this.strictbounds,
     this.region,
+    this.pickArea,
     this.selectInitialPosition = false,
     this.resizeToAvoidBottomInset = true,
     this.initialSearchString,
@@ -62,6 +71,33 @@ class PlacePicker extends StatefulWidget {
     this.autocompleteOnTrailingWhitespace = false,
     this.hidePlaceDetailsWhenDraggingPin = true,
     this.useCameraLocationAsCoordinates = false,
+    this.myLocationEnabled: true,
+    this.myLocationButtonEnabled: true,
+    this.zoomControlsEnabled: true,
+    this.zoomGesturesEnabled: true,
+    this.mapToolbarEnabled: true,
+    this.buildingsEnabled: true,
+    this.trafficEnabled: true,
+    this.rotateGesturesEnabled: true,
+    this.tiltGesturesEnabled: true,
+    this.indoorViewEnabled: true,
+    this.compassEnabled: true,
+    this.scrollGesturesEnabled: true,
+    this.activateMapIcons: true,
+    this.mapStyle,
+    this.customBarWidgetBuilder,
+    this.useDefaultSearchBar: true,
+    this.iconPlaceColor: Colors.red,
+    this.iconPointerColor: Colors.black,
+    this.mapTypeColor: Colors.black,
+    this.myLocationColor: Colors.black, 
+    this.mapToolSeparation: 10, 
+    this.mapToolRight:15,
+    this.onTapBack,
+    this.onCameraMoveStarted,
+    this.onCameraMove,
+    this.onCameraIdle,
+    this.onMapTypeChanged,
   }) : super(key: key);
 
   final String apiKey;
@@ -70,12 +106,10 @@ class PlacePicker extends StatefulWidget {
   final bool? useCurrentLocation;
   final LocationAccuracy desiredLocationAccuracy;
 
-  final MapCreatedCallback? onMapCreated;
-
   final String? hintText;
   final String? searchingText;
-  // final double searchBarHeight;
-  // final EdgeInsetsGeometry contentPadding;
+  final String? selectText;
+  final String? outsideOfPickAreaText;
 
   final ValueChanged<String>? onAutoCompleteFailed;
   final ValueChanged<String>? onGeocodingSearchFailed;
@@ -97,6 +131,45 @@ class PlacePicker extends StatefulWidget {
   final List<Component>? autocompleteComponents;
   final bool? strictbounds;
   final String? region;
+
+  /// Visualize Default Map Icon widgets
+  final bool activateMapIcons;
+
+  /// Google Maps Configuration
+  final bool? myLocationEnabled;
+
+  /// Google Maps Configuration
+  final bool? myLocationButtonEnabled;
+
+  /// Google Maps Configuration
+  final bool? mapToolbarEnabled;
+
+  /// Google Maps Configuration
+  final bool? buildingsEnabled;
+
+  /// Google Maps Configuration
+  final bool? trafficEnabled;
+
+  /// Google Maps Configuration
+  final bool? rotateGesturesEnabled;
+
+  /// Google Maps Configuration
+  final bool? tiltGesturesEnabled;
+
+  /// Google Maps Configuration
+  final bool? indoorViewEnabled;
+
+  /// Google Maps Configuration
+  final bool? compassEnabled;
+
+  /// Google Maps Configuration
+  final bool? scrollGesturesEnabled;
+
+  /// Google Maps Configuration
+  final String? mapStyle;
+  /// If set the picker can only pick addresses in the given circle area.
+  /// The section will be highlighted.
+  final CircleArea? pickArea;
 
   /// If true the [body] and the scaffold's floating widgets should size
   /// themselves to avoid the onscreen keyboard whose height is defined by the
@@ -127,6 +200,11 @@ class PlacePicker extends StatefulWidget {
   ///
   /// It is provided by default if you leave it as a null.
   final PinBuilder? pinBuilder;
+
+  /// optional - builds customized introduction panel.
+  ///
+  /// None is provided / the map is instantly accessible if you leave it as a null.
+  final IntroModalWidgetBuilder? introModalWidgetBuilder;
 
   /// optional - sets 'proxy' value in google_maps_webservice
   ///
@@ -168,6 +246,70 @@ class PlacePicker extends StatefulWidget {
   final bool hidePlaceDetailsWhenDraggingPin;
 
   final bool useCameraLocationAsCoordinates;
+  // Raised when clicking on the back arrow.
+  // This will not listen for the system back button on Android devices.
+  // If this is not set, but the back button is visible through automaticallyImplyLeading,
+  // the Navigator will try to pop instead.
+  final VoidCallback? onTapBack;
+
+  /// GoogleMap pass-through events:
+
+  /// Callback method for when the map is ready to be used.
+  ///
+  /// Used to receive a [GoogleMapController] for this [GoogleMap].
+  final MapCreatedCallback? onMapCreated;
+
+  /// Called when the camera starts moving.
+  ///
+  /// This can be initiated by the following:
+  /// 1. Non-gesture animation initiated in response to user actions.
+  ///    For example: zoom buttons, my location button, or marker clicks.
+  /// 2. Programmatically initiated animation.
+  /// 3. Camera motion initiated in response to user gestures on the map.
+  ///    For example: pan, tilt, pinch to zoom, or rotate.
+  final Function(PlaceProvider)? onCameraMoveStarted;
+
+  /// Called repeatedly as the camera continues to move after an
+  /// onCameraMoveStarted call.
+  ///
+  /// This may be called as often as once every frame and should
+  /// not perform expensive operations.
+  final CameraPositionCallback? onCameraMove;
+
+  /// Called when camera movement has ended, there are no pending
+  /// animations and the user has stopped interacting with the map.
+  final Function(PlaceProvider)? onCameraIdle;
+
+  /// Called when the map type has been changed.
+  final Function(MapType)? onMapTypeChanged;
+
+  /// Allow user to make visible the zoom button & toggle on & off zoom gestures
+  final bool zoomGesturesEnabled;
+  final bool zoomControlsEnabled;
+
+  /// This will build a custom bar instead of the default search bar
+  final Widget? customBarWidgetBuilder;
+
+  /// This will activate/deactivate the search bar to use the customBarWidgetBuilder
+  final bool useDefaultSearchBar;
+
+  /// This will change color  of Icon Place
+  final Color iconPlaceColor;
+
+  /// This will change color  of Pointer
+  final Color iconPointerColor;
+
+  /// This will change color  of layer button
+  final Color mapTypeColor;
+
+  /// This will change color  of location button
+  final Color myLocationColor;
+
+  /// This will change the height of separation between layer and location buttons
+  final double? mapToolSeparation;
+
+  /// This will change right separation from  view
+  final double? mapToolRight;
 
   @override
   _PlacePickerState createState() => _PlacePickerState();
@@ -175,9 +317,10 @@ class PlacePicker extends StatefulWidget {
 
 class _PlacePickerState extends State<PlacePicker> {
   GlobalKey appBarKey = GlobalKey();
-  Future<PlaceProvider>? _futureProvider;
+  late final Future<PlaceProvider> _futureProvider;
   PlaceProvider? provider;
   SearchBarController searchBarController = SearchBarController();
+  bool showIntroModal = true;
 
   @override
   void initState() {
@@ -188,7 +331,9 @@ class _PlacePickerState extends State<PlacePicker> {
 
   @override
   void dispose() {
-    searchBarController.dispose();
+    if (widget.useDefaultSearchBar) {
+      searchBarController.dispose();
+    }
 
     super.dispose();
   }
@@ -201,10 +346,12 @@ class _PlacePickerState extends State<PlacePicker> {
       widget.httpClient,
       headers,
     );
-    provider.sessionToken = Uuid().generateV4();
+    provider.sessionToken = Uuid().v4();
     provider.desiredAccuracy = widget.desiredLocationAccuracy;
     provider.setMapType(widget.initialMapType);
-
+    if (widget.useCurrentLocation != null && widget.useCurrentLocation!) {
+      await provider.updateCurrentLocation(widget.forceAndroidLocationManager);
+    }
     return provider;
   }
 
@@ -218,14 +365,17 @@ class _PlacePickerState extends State<PlacePicker> {
       child: FutureBuilder<PlaceProvider>(
         future: _futureProvider,
         builder: (context, snapshot) {
-          if (snapshot.hasData) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasData) {
             provider = snapshot.data;
 
             return MultiProvider(
               providers: [
                 ChangeNotifierProvider<PlaceProvider>.value(value: provider!),
               ],
-              child: Scaffold(
+              child: Stack(children: [
+                Scaffold(
                 key: ValueKey<int>(provider.hashCode),
                 resizeToAvoidBottomInset: widget.resizeToAvoidBottomInset,
                 extendBodyBehindAppBar: true,
@@ -236,12 +386,17 @@ class _PlacePickerState extends State<PlacePicker> {
                   elevation: 0,
                   backgroundColor: Colors.transparent,
                   titleSpacing: 0.0,
-                  title: _buildSearchBar(context),
+                  
+                  title: widget.useDefaultSearchBar
+                      ? _buildSearchBar(context)
+                      : widget.customBarWidgetBuilder,
                 ),
                 body: _buildMapWithLocation(),
               ),
-            );
+            _buildIntroModal(context),
+              ],),);
           }
+
 
           final children = <Widget>[];
           if (snapshot.hasError) {
@@ -258,30 +413,39 @@ class _PlacePickerState extends State<PlacePicker> {
           } else {
             children.add(CircularProgressIndicator());
           }
-
-          return Scaffold(
-            body: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: children,
+          
+            return Scaffold(
+              body: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: children,
+                ),
               ),
-            ),
-          );
-        },
-      ),
-    );
+            );
+          },
+        ));
   }
 
   Widget _buildSearchBar(BuildContext context) {
     return Row(
       children: <Widget>[
-        widget.automaticallyImplyAppBarLeading
+        widget.automaticallyImplyAppBarLeading || widget.onTapBack != null
             ? IconButton(
-                onPressed: () => Navigator.maybePop(context),
+                onPressed: () {
+                  if (!showIntroModal ||
+                      widget.introModalWidgetBuilder == null) {
+                    if (widget.onTapBack != null) {
+                      widget.onTapBack!();
+                      return;
+                    }
+                    Navigator.maybePop(context);
+                  }
+                },
                 icon: Icon(
                   Platform.isIOS ? Icons.arrow_back_ios : Icons.arrow_back,
                 ),
+                color: Colors.black.withAlpha(128),
                 padding: EdgeInsets.zero)
             : SizedBox(width: 15),
         Expanded(
@@ -400,6 +564,7 @@ class _PlacePickerState extends State<PlacePicker> {
 
   Widget _buildMap(LatLng initialTarget) {
     return GoogleMapPlacePicker(
+      fullMotion: !widget.resizeToAvoidBottomInset,
       initialTarget: initialTarget,
       appBarKey: appBarKey,
       selectedPlaceWidgetBuilder: widget.selectedPlaceWidgetBuilder,
@@ -413,10 +578,36 @@ class _PlacePickerState extends State<PlacePicker> {
       onMapCreated: widget.onMapCreated,
       selectInitialPosition: widget.selectInitialPosition,
       language: widget.autocompleteLanguage,
+      pickArea: widget.pickArea,
       forceSearchOnZoomChanged: widget.forceSearchOnZoomChanged,
       hidePlaceDetailsWhenDraggingPin: widget.hidePlaceDetailsWhenDraggingPin,
+      myLocationEnabled: widget.myLocationEnabled,
+      myLocationButtonEnabled: widget.myLocationButtonEnabled,
+      mapToolbarEnabled: widget.mapToolbarEnabled,
+      buildingsEnabled: widget.buildingsEnabled,
+      trafficEnabled: widget.trafficEnabled,
+      rotateGesturesEnabled: widget.rotateGesturesEnabled,
+      tiltGesturesEnabled: widget.tiltGesturesEnabled,
+      indoorViewEnabled: widget.indoorViewEnabled,
+      compassEnabled: widget.compassEnabled,
+      scrollGesturesEnabled: widget.scrollGesturesEnabled,
+      mapStyle: widget.mapStyle,
+      activateMapIcons: widget.activateMapIcons,
+      useDefaultSearchBar: widget.useDefaultSearchBar,
+      iconPlaceColor: widget.iconPlaceColor,
+      iconPointerColor: widget.iconPointerColor,
+      mapTypeColor: widget.mapTypeColor,
+      myLocationColor: widget.myLocationColor,
+      customBarWidgetBuilder: widget.customBarWidgetBuilder,
+      mapToolSeparation: widget.mapToolSeparation,
+      mapToolRight: widget.mapToolRight,
+      selectText: widget.selectText,
+      outsideOfPickAreaText: widget.outsideOfPickAreaText,
       onToggleMapType: () {
         provider!.switchMapType();
+        if (widget.onMapTypeChanged != null) {
+          widget.onMapTypeChanged!(provider!.mapType);
+        }
       },
       onMyLocation: () async {
         // Prevent to click many times in short period.
@@ -431,10 +622,46 @@ class _PlacePickerState extends State<PlacePicker> {
         }
       },
       onMoveStart: () {
-        searchBarController.reset();
+        if (widget.useDefaultSearchBar) {
+          searchBarController.reset();
+        }
       },
       onPlacePicked: widget.onPlacePicked,
       useCameraLocationAsCoordinates: widget.useCameraLocationAsCoordinates,
+      onCameraMoveStarted: widget.onCameraMoveStarted,
+      onCameraMove: widget.onCameraMove,
+      onCameraIdle: widget.onCameraIdle,
+      zoomGesturesEnabled: widget.zoomGesturesEnabled,
+      zoomControlsEnabled: widget.zoomControlsEnabled,
     );
+  }
+
+  Widget _buildIntroModal(BuildContext context) {
+    return StatefulBuilder(
+        builder: (BuildContext context, StateSetter setState) {
+      return showIntroModal && widget.introModalWidgetBuilder != null
+          ? Stack(children: [
+              Positioned(
+                top: 0,
+                right: 0,
+                bottom: 0,
+                left: 0,
+                child: Material(
+                  type: MaterialType.canvas,
+                  color: Color.fromARGB(128, 0, 0, 0),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.zero,
+                  ),
+                  child: ClipRect(),
+                ),
+              ),
+              widget.introModalWidgetBuilder!(context, () {
+                setState(() {
+                  showIntroModal = false;
+                });
+              })
+            ])
+          : Container();
+    });
   }
 }

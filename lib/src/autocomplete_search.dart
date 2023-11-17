@@ -15,8 +15,9 @@ class AutoCompleteSearch extends StatefulWidget {
       required this.sessionToken,
       required this.onPicked,
       required this.appBarKey,
-      this.hintText,
+      this.hintText = "Search here",
       this.searchingText = "Searching...",
+      this.hidden = false,
       this.height = 40,
       this.contentPadding = EdgeInsets.zero,
       this.debounceMilliseconds,
@@ -37,6 +38,7 @@ class AutoCompleteSearch extends StatefulWidget {
   final String? sessionToken;
   final String? hintText;
   final String? searchingText;
+  final bool hidden;
   final double height;
   final EdgeInsetsGeometry contentPadding;
   final int? debounceMilliseconds;
@@ -69,7 +71,7 @@ class AutoCompleteSearchState extends State<AutoCompleteSearch> {
   void initState() {
     super.initState();
     if (widget.initialSearchString != null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
+      _ambiguate(WidgetsBinding.instance)!.addPostFrameCallback((_) {
         controller.text = widget.initialSearchString!;
         if (widget.searchForInitialValue!) {
           _onSearchInputChange();
@@ -96,14 +98,14 @@ class AutoCompleteSearchState extends State<AutoCompleteSearch> {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider.value(
+    return !widget.hidden ? ChangeNotifierProvider.value(
       value: provider,
       child: RoundedFrame(
         height: widget.height,
         padding: const EdgeInsets.only(right: 10),
         color: Theme.of(context).brightness == Brightness.dark ? Colors.black54 : Colors.white,
         borderRadius: BorderRadius.circular(20),
-        elevation: 8.0,
+        elevation: 4.0,
         child: Row(
           children: <Widget>[
             SizedBox(width: 10),
@@ -114,7 +116,7 @@ class AutoCompleteSearchState extends State<AutoCompleteSearch> {
           ],
         ),
       ),
-    );
+    ) : Container();
   }
 
   Widget _buildSearchTextField() {
@@ -214,11 +216,13 @@ class AutoCompleteSearchState extends State<AutoCompleteSearch> {
     _clearOverlay();
 
     final RenderBox? appBarRenderBox = widget.appBarKey.currentContext!.findRenderObject() as RenderBox?;
+    final translation = appBarRenderBox?.getTransformTo(null).getTranslation();
+    final Offset offset = translation != null ? Offset(translation.x, translation.y) : Offset(0.0, 0.0);
     final screenWidth = MediaQuery.of(context).size.width;
 
     overlayEntry = OverlayEntry(
       builder: (context) => Positioned(
-        top: appBarRenderBox!.size.height,
+        top: appBarRenderBox!.paintBounds.shift(offset).top + appBarRenderBox.size.height,
         left: screenWidth * 0.025,
         right: screenWidth * 0.025,
         child: Material(
@@ -310,4 +314,12 @@ class AutoCompleteSearchState extends State<AutoCompleteSearch> {
   clearOverlay() {
     _clearOverlay();
   }
+
+  /// This allows a value of type T or T? to be treated as a value of type T?.
+  ///
+  /// We use this so that APIs that have become non-nullable can still be used
+  /// with `!` and `?` on the stable branch.
+  // TODO: Remove this, once Flutter 2 support is dropped
+  // See https://github.com/flutter/flutter/issues/64830
+  T? _ambiguate<T>(T? value) => value;
 }
