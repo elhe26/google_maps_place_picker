@@ -16,6 +16,7 @@ import 'package:provider/provider.dart';
 import 'dart:io' show Platform;
 
 enum PinState { Preparing, Idle, Dragging }
+
 enum SearchingState { Idle, Searching }
 
 class PlacePicker extends StatefulWidget {
@@ -120,7 +121,7 @@ class PlacePicker extends StatefulWidget {
   /// optional - builds selected place's UI
   ///
   /// It is provided by default if you leave it as a null.
-  /// INPORTANT: If this is non-null, [onPlacePicked] will not be invoked, as there will be no default 'Select here' button.
+  /// IMPORTANT: If this is non-null, [onPlacePicked] will not be invoked, as there will be no default 'Select here' button.
   final SelectedPlaceWidgetBuilder? selectedPlaceWidgetBuilder;
 
   /// optional - builds customized pin widget which indicates current pointing position.
@@ -210,10 +211,9 @@ class _PlacePickerState extends State<PlacePicker> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () {
+    return PopScope(
+      onPopInvoked: (value) {
         searchBarController.clearOverlay();
-        return Future.value(true);
       },
       child: FutureBuilder<PlaceProvider>(
         future: _futureProvider,
@@ -248,7 +248,7 @@ class _PlacePickerState extends State<PlacePicker> {
             children.addAll([
               Icon(
                 Icons.error_outline,
-                color: Theme.of(context).errorColor,
+                color: Theme.of(context).colorScheme.error,
               ),
               Padding(
                 padding: const EdgeInsets.only(top: 16),
