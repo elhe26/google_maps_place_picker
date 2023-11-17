@@ -60,10 +60,10 @@ class PlaceProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Position? _currentPoisition;
-  Position? get currentPosition => _currentPoisition;
+  Position? _currentPosition;
+  Position? get currentPosition => _currentPosition;
   set currentPosition(Position? newPosition) {
-    _currentPoisition = newPosition;
+    _currentPosition = newPosition;
     notifyListeners();
   }
 
@@ -114,10 +114,10 @@ class PlaceProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  bool _isSeachBarFocused = false;
-  bool get isSearchBarFocused => _isSeachBarFocused;
+  bool _isSearchBarFocused = false;
+  bool get isSearchBarFocused => _isSearchBarFocused;
   set isSearchBarFocused(bool focused) {
-    _isSeachBarFocused = focused;
+    _isSearchBarFocused = focused;
     notifyListeners();
   }
 
